@@ -28,10 +28,24 @@
   align-items: center;
 }
 
+.logo {
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  cursor: pointer;
+}
+
 .logo h2 {
   font-size: 1.5rem;
   color: var(--color-primary);
   font-weight: 700;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover h2 {
+  transform: scale(1.05);
 }
 
 .nav {
@@ -43,25 +57,64 @@
 .nav a {
   font-weight: 500;
   color: var(--color-text);
-  font-size: 0.95rem;
-  transition: color 0.3s ease;
+  font-size: 1.05rem;
+  transition: all 0.3s ease;
+  position: relative;
+  padding-bottom: 2px;
+}
+
+.nav a::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--color-primary);
+  transition: width 0.3s ease;
 }
 
 .nav a:hover {
   color: var(--color-primary);
 }
 
+.nav a:hover::after {
+  width: 100%;
+}
+
 .btn-nav {
-  padding: 0.625rem 1.25rem;
-  background-color: var(--color-primary);
+  height: 40px;
+  width: 120px;
+
+  display: flex; /* 👈 clave */
+  align-items: center; /* 👈 centra vertical */
+  justify-content: center; /* 👈 centra horizontal */
+
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-dark)
+  );
   color: white !important;
   border-radius: var(--radius-md);
   font-weight: 600;
+  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-nav:hover::before {
+  left: 100%;
+}
+
+.btn-nav::after {
+  display: none;
 }
 
 .btn-nav:hover {
-  background-color: var(--color-primary-dark);
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, var(--color-primary-dark), #1e3a8a);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.4);
 }
 
 /* ============================================
@@ -582,10 +635,21 @@
 .guarantee-icon {
   margin-bottom: var(--spacing-lg);
   display: inline-block;
+  animation: float 3s ease-in-out infinite;
 }
 
 .guarantee-icon svg {
   color: rgba(255, 255, 255, 0.9);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
 }
 
 .guarantee h2 {

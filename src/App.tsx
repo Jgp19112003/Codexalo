@@ -159,9 +159,9 @@ function App() {
       <header className="header">
         <div className="container">
           <div className="header-content">
-            <div className="logo">
+            <a href="#" className="logo">
               <h2>Codexalo</h2>
-            </div>
+            </a>
             <nav className="nav">
               <a href="#servicios">Servicios</a>
               <a href="#contacto">TFG</a>

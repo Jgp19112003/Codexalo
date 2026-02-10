@@ -23,7 +23,7 @@
 
   /* Tipografía */
   --font-primary: "Inter", system-ui, -apple-system, sans-serif;
-  --font-heading: "Merriweather", Georgia, serif;
+  --font-heading: "Inter", system-ui, -apple-system, sans-serif;
 
   /* Espaciado */
   --spacing-xs: 0.5rem;
