@@ -1,0 +1,17 @@
+# robots.txt para Codexalo
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://codexalo.es/sitemap.xml
+
+# Crawl-delay para bots
+Crawl-delay: 0
+
+# Permitir todos los recursos importantes
+Allow: /assets/
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.svg$
