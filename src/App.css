@@ -310,7 +310,7 @@
 ============================================ */
 .services {
   padding: var(--spacing-3xl) 0;
-  background-color: var(--color-bg);
+  background: linear-gradient(135deg, #fafbfc 0%, #f9fafb 100%);
 }
 
 .services .container {
@@ -321,57 +321,107 @@
 .services-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--spacing-2xl);
+  gap: var(--spacing-xl);
 }
 
 .service-card {
-  padding: var(--spacing-2xl);
-  background-color: white;
+  position: relative;
+  padding: var(--spacing-xl);
+  background: white;
   border-radius: var(--radius-xl);
-  border: 1px solid var(--color-border);
-  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
   color: inherit;
-  display: block;
+  display: flex;
+  flex-direction: column;
   cursor: pointer;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+}
+
+.service-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary),
+    var(--color-primary-light),
+    var(--color-accent)
+  );
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.service-card:hover::before {
+  transform: scaleX(1);
 }
 
 .service-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-xl);
-  border-color: var(--color-primary-light);
-  text-decoration: none;
+  transform: translateY(-8px);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: rgba(59, 130, 246, 0.1);
 }
 
 .service-icon {
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   background: linear-gradient(
     135deg,
-    var(--color-primary-light),
-    var(--color-accent)
+    rgba(59, 130, 246, 0.1),
+    rgba(8, 145, 178, 0.1)
   );
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.service-card:hover .service-icon {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-light),
+    var(--color-accent)
+  );
+  transform: scale(1.05);
 }
 
 .service-icon svg {
+  color: var(--color-primary);
+  transition: color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.service-card:hover .service-icon svg {
   color: white;
 }
 
 .service-card h3 {
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   margin-bottom: var(--spacing-md);
   color: var(--color-secondary);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
 }
 
 .service-card p {
-  color: var(--color-text-light);
-  margin-bottom: var(--spacing-md);
-  line-height: 1.7;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.75;
+  font-size: 0.975rem;
+  text-align: left;
+  flex-grow: 1;
 }
 
 .service-card ul {
@@ -1348,12 +1398,23 @@
     padding: var(--spacing-lg);
   }
 
+  .service-icon {
+    width: 64px;
+    height: 64px;
+  }
+
+  .service-icon svg {
+    width: 36px;
+    height: 36px;
+  }
+
   .service-card h3 {
     font-size: 1.25rem;
   }
 
   .service-card p {
     font-size: 0.95rem;
+    line-height: 1.7;
   }
 
   /* Ocultar listas en servicios móvil */
@@ -1572,28 +1633,28 @@
   }
 
   .service-card {
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg);
   }
 
   .service-icon {
-    width: 56px;
-    height: 56px;
-    margin-bottom: var(--spacing-sm);
+    width: 64px;
+    height: 64px;
+    margin-bottom: var(--spacing-md);
   }
 
   .service-icon svg {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
   }
 
   .service-card h3 {
-    font-size: 1.15rem;
-    margin-bottom: var(--spacing-sm);
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-md);
   }
 
   .service-card p {
-    font-size: 0.9rem;
-    margin-bottom: var(--spacing-sm);
+    font-size: 0.95rem;
+    line-height: 1.7;
   }
 
   /* Ocultar listas en servicios móvil */

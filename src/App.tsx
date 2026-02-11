@@ -282,12 +282,6 @@ function App() {
                 Cualquier tecnología, documentación exhaustiva y preparación
                 para la defensa.
               </p>
-              <ul>
-                <li>Análisis de requisitos</li>
-                <li>Desarrollo full-stack</li>
-                <li>Testing y calidad</li>
-                <li>Memoria técnica completa</li>
-              </ul>
             </a>
 
             <a href="#contacto" className="service-card">
@@ -309,12 +303,6 @@ function App() {
                 Proyectos prácticos de módulos específicos de DAM y DAW,
                 cumpliendo con los criterios de evaluación oficiales.
               </p>
-              <ul>
-                <li>Adaptación al temario</li>
-                <li>Código limpio y documentado</li>
-                <li>Buenas prácticas</li>
-                <li>Entrega en plazo</li>
-              </ul>
             </a>
 
             <a href="#contacto" className="service-card">
@@ -336,12 +324,6 @@ function App() {
                 Desarrollos para ingenierías informáticas y grados de
                 tecnología: sistemas, bases de datos, IA, DevOps y más.
               </p>
-              <ul>
-                <li>Arquitecturas escalables</li>
-                <li>Tecnologías actuales</li>
-                <li>Metodologías ágiles</li>
-                <li>Documentación académica</li>
-              </ul>
             </a>
 
             <a href="#clases" className="service-card">
@@ -366,12 +348,6 @@ function App() {
                 activo. Cualquier tecnología, horarios flexibles y adaptadas a
                 tu nivel.
               </p>
-              <ul>
-                <li>Profesores expertos</li>
-                <li>Horarios flexibles</li>
-                <li>Seguimiento personalizado</li>
-                <li>Ayuda con prácticas y proyectos</li>
-              </ul>
             </a>
           </div>
         </div>
