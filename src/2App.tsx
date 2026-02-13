@@ -27,15 +27,6 @@ function App() {
   const [isSubmittingClases, setIsSubmittingClases] = useState(false);
   const [submitMessageClases, setSubmitMessageClases] = useState("");
   const [modalAbierto, setModalAbierto] = useState<string | null>(null);
-  const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
-
-  const toggleMenuMovil = () => {
-    setMenuMovilAbierto(!menuMovilAbierto);
-  };
-
-  const cerrarMenuMovil = () => {
-    setMenuMovilAbierto(false);
-  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -164,50 +155,21 @@ function App() {
 
   return (
     <div className="landing-page">
-      {/* Overlay para cerrar menú móvil */}
-      {menuMovilAbierto && (
-        <div className="menu-overlay" onClick={cerrarMenuMovil}></div>
-      )}
-
       {/* Header */}
       <header className="header">
         <div className="container">
           <div className="header-content">
-            <a href="#" className="logo">
+            <div className="logo">
               <h2>Codexalo</h2>
-            </a>
-            <a href="#contacto" className="btn-contactar-movil">
-              Contactar
-            </a>
-            <button
-              className="menu-hamburguesa"
-              onClick={toggleMenuMovil}
-              aria-label="Menú"
-            >
-              <span></span>
-              <span></span>
-              <span></span>
-            </button>
-            <nav className={`nav ${menuMovilAbierto ? "nav-abierto" : ""}`}>
-              <a href="#servicios" onClick={cerrarMenuMovil}>
-                Servicios
-              </a>
-              <a href="#contacto" onClick={cerrarMenuMovil}>
-                TFG
-              </a>
-              <a href="#clases" onClick={cerrarMenuMovil}>
-                Clases
-              </a>
-              <a href="#como-funciona" onClick={cerrarMenuMovil}>
-                Cómo funciona
-              </a>
-              <a href="#ventajas" onClick={cerrarMenuMovil}>
-                Ventajas
-              </a>
-              <a href="#garantia" onClick={cerrarMenuMovil}>
-                Garantía
-              </a>
-              <a href="#contacto" className="btn-nav" onClick={cerrarMenuMovil}>
+            </div>
+            <nav className="nav">
+              <a href="#servicios">Servicios</a>
+              <a href="#contacto">TFG</a>
+              <a href="#clases">Clases</a>
+              <a href="#como-funciona">Cómo funciona</a>
+              <a href="#ventajas">Ventajas</a>
+              <a href="#garantia">Garantía</a>
+              <a href="#contacto" className="btn-nav">
                 Contactar
               </a>
             </nav>
