@@ -4,28 +4,30 @@ import "./App.css";
 
 function App() {
   const [formData, setFormData] = useState({
+    tipoServicio: "",
     nombre: "",
     email: "",
     telefono: "",
     tipoProyecto: "",
     grado: "",
-    mensaje: "",
-    aceptaPrivacidad: false,
-  });
-
-  const [clasesFormData, setClasesFormData] = useState({
-    nombre: "",
-    email: "",
-    telefono: "",
     tema: "",
     mensaje: "",
     aceptaPrivacidad: false,
   });
 
+  const [trabajoFormData, setTrabajoFormData] = useState({
+    nombre: "",
+    email: "",
+    telefono: "",
+    descripcion: "",
+    linkedin: "",
+    aceptaPrivacidad: false,
+  });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
-  const [isSubmittingClases, setIsSubmittingClases] = useState(false);
-  const [submitMessageClases, setSubmitMessageClases] = useState("");
+  const [isSubmittingTrabajo, setIsSubmittingTrabajo] = useState(false);
+  const [submitMessageTrabajo, setSubmitMessageTrabajo] = useState("");
   const [modalAbierto, setModalAbierto] = useState<string | null>(null);
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
 
@@ -47,8 +49,14 @@ function App() {
         name: formData.nombre,
         email: formData.email,
         telefono: formData.telefono,
-        tipoProyecto: formData.tipoProyecto,
-        grado: formData.grado,
+        tipoProyecto:
+          formData.tipoServicio === "Clases Particulares"
+            ? "Clases Particulares"
+            : formData.tipoProyecto,
+        grado:
+          formData.tipoServicio === "Clases Particulares"
+            ? formData.tema
+            : formData.grado,
         message: formData.mensaje,
         time: new Date().toLocaleString("es-ES"),
       };
@@ -60,15 +68,20 @@ function App() {
         "w84e7dOMfq4ju3Ons", // Reemplaza con tu Public Key de EmailJS
       );
 
-      setSubmitMessage(
-        "¡Gracias por tu interés! Te contactaremos en menos de 24 horas.",
-      );
+      const successMessage =
+        formData.tipoServicio === "Clases Particulares"
+          ? "¡Gracias por tu interés! Te contactaremos en menos de 24 horas para encontrar al profesor ideal para ti."
+          : "¡Gracias por tu interés! Te contactaremos en menos de 24 horas.";
+
+      setSubmitMessage(successMessage);
       setFormData({
+        tipoServicio: "",
         nombre: "",
         email: "",
         telefono: "",
         tipoProyecto: "",
         grado: "",
+        tema: "",
         mensaje: "",
         aceptaPrivacidad: false,
       });
@@ -95,19 +108,31 @@ function App() {
     });
   };
 
-  const handleClasesSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleTrabajoChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
+    const { name, value, type } = e.target;
+    setTrabajoFormData({
+      ...trabajoFormData,
+      [name]:
+        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
+    });
+  };
+
+  const handleTrabajoSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsSubmittingClases(true);
-    setSubmitMessageClases("");
+    setIsSubmittingTrabajo(true);
+    setSubmitMessageTrabajo("");
 
     try {
       const templateParams = {
-        name: clasesFormData.nombre,
-        email: clasesFormData.email,
-        telefono: clasesFormData.telefono,
-        tipoProyecto: "Clases Particulares",
-        grado: clasesFormData.tema,
-        message: clasesFormData.mensaje,
+        name: trabajoFormData.nombre,
+        email: trabajoFormData.email,
+        telefono: trabajoFormData.telefono || "No proporcionado",
+        descripcion: trabajoFormData.descripcion,
+        linkedin: trabajoFormData.linkedin || "No proporcionado",
         time: new Date().toLocaleString("es-ES"),
       };
 
@@ -115,41 +140,28 @@ function App() {
         "service_b49t2r7",
         "template_3clmbfj",
         templateParams,
-        "w84e7dOMfq4ju3Ons", // Reemplaza con tu Public Key de EmailJS
+        "w84e7dOMfq4ju3Ons",
       );
 
-      setSubmitMessageClases(
-        "¡Gracias por tu interés! Te contactaremos en menos de 24 horas para encontrar al profesor ideal para ti.",
+      setSubmitMessageTrabajo(
+        "¡Gracias por tu interés! Revisaremos tu solicitud y nos pondremos en contacto contigo pronto.",
       );
-      setClasesFormData({
+      setTrabajoFormData({
         nombre: "",
         email: "",
         telefono: "",
-        tema: "",
-        mensaje: "",
+        descripcion: "",
+        linkedin: "",
         aceptaPrivacidad: false,
       });
     } catch (error) {
       console.error("Error al enviar el correo:", error);
-      setSubmitMessageClases(
+      setSubmitMessageTrabajo(
         "Hubo un error al enviar el formulario. Por favor, inténtalo de nuevo.",
       );
     } finally {
-      setIsSubmittingClases(false);
+      setIsSubmittingTrabajo(false);
     }
-  };
-
-  const handleClasesChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
-  ) => {
-    const { name, value, type } = e.target;
-    setClasesFormData({
-      ...clasesFormData,
-      [name]:
-        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
-    });
   };
 
   const abrirModal = (tipo: string) => {
@@ -206,6 +218,9 @@ function App() {
               </a>
               <a href="#garantia" onClick={cerrarMenuMovil}>
                 Garantía
+              </a>
+              <a href="#trabaja" onClick={cerrarMenuMovil}>
+                Trabaja con nosotros
               </a>
               <a href="#contacto" className="btn-nav" onClick={cerrarMenuMovil}>
                 Contactar
@@ -627,6 +642,11 @@ function App() {
 
       {/* Formulario de contacto TFG */}
       <section id="contacto" className="contact">
+        <img
+          src="/student5.png"
+          alt="Estudiante"
+          className="contact-student-image"
+        />
         <div className="container">
           <div className="contact-wrapper">
             <div className="contact-info">
@@ -635,55 +655,114 @@ function App() {
                 Cuéntanos qué necesitas y haremos un seguimiento basado en los
                 requerimientos en menos de 24 horas.
               </p>
-              <div className="contact-features">
-                <div className="contact-feature">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                  <span>Respuesta en menos de 24h</span>
-                </div>
-                <div className="contact-feature">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                  <span>Presupuesto sin compromiso</span>
-                </div>
-                <div className="contact-feature">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                  <span>Confidencialidad absoluta</span>
-                </div>
+
+              <div className="clases-features-grid">
+                <a href="#formulario" className="clases-feature-card">
+                  <div className="clases-feature-icon">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                  </div>
+                  <h3>Profesionales en activo</h3>
+                  <p>
+                    Desarrolladores e ingenieros trabajando en empresas
+                    tecnológicas.
+                  </p>
+                </a>
+
+                <a href="#formulario" className="clases-feature-card">
+                  <div className="clases-feature-icon">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                  </div>
+                  <h3>Horarios flexibles</h3>
+                  <p>Clases online adaptadas a tu disponibilidad y ritmo.</p>
+                </a>
+
+                <a href="#formulario" className="clases-feature-card">
+                  <div className="clases-feature-icon">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <polyline points="16 18 22 12 16 6"></polyline>
+                      <polyline points="8 6 2 12 8 18"></polyline>
+                    </svg>
+                  </div>
+                  <h3>Cualquier tecnología</h3>
+                  <p>
+                    Java, Python, JavaScript, React, IA y todas las áreas de
+                    programación.
+                  </p>
+                </a>
+
+                <a href="#formulario" className="clases-feature-card">
+                  <div className="clases-feature-icon">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                  </div>
+                  <h3>Prácticas y proyectos</h3>
+                  <p>
+                    Ayuda con proyectos académicos mientras aprendes de verdad.
+                  </p>
+                </a>
               </div>
-              <img
-                src="/student5.png"
-                alt="Estudiante"
-                className="contact-student-image"
-              />
             </div>
-            <div className="contact-form-wrapper">
+            <div className="contact-form-wrapper" id="formulario">
               <form className="contact-form" onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label htmlFor="tipoServicio">
+                    ¿Qué servicio necesitas? *
+                  </label>
+                  <select
+                    id="tipoServicio"
+                    name="tipoServicio"
+                    value={formData.tipoServicio}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Selecciona un servicio</option>
+                    <option value="TFG">TFG o Proyecto Académico</option>
+                    <option value="Clases Particulares">
+                      Clases Particulares
+                    </option>
+                  </select>
+                </div>
+
                 <div className="form-group">
                   <label htmlFor="nombre">Nombre completo *</label>
                   <input
@@ -719,59 +798,118 @@ function App() {
                     placeholder="Tu número de teléfono"
                   />
                 </div>
-                <div className="form-group">
-                  <label htmlFor="tipoProyecto">Tipo de proyecto *</label>
-                  <select
-                    id="tipoProyecto"
-                    name="tipoProyecto"
-                    value={formData.tipoProyecto}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Selecciona una opción</option>
-                    <option value="TFG">TFG (Trabajo Fin de Grado)</option>
-                    <option value="practicas">Prácticas de módulo</option>
-                    <option value="proyecto">Proyecto académico</option>
-                    <option value="otro">Otro</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="grado">Grado o ciclo *</label>
-                  <select
-                    id="grado"
-                    name="grado"
-                    value={formData.grado}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Selecciona una opción</option>
-                    <option value="DAM">
-                      DAM (Desarrollo de Aplicaciones Multiplataforma)
-                    </option>
-                    <option value="DAW">
-                      DAW (Desarrollo de Aplicaciones Web)
-                    </option>
-                    <option value="ingenieria-informatica">
-                      Ingeniería Informática
-                    </option>
-                    <option value="ingenieria-software">
-                      Ingeniería del Software
-                    </option>
-                    <option value="otro">Otro grado tecnológico</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="mensaje">Cuéntanos sobre tu proyecto *</label>
-                  <textarea
-                    id="mensaje"
-                    name="mensaje"
-                    value={formData.mensaje}
-                    onChange={handleChange}
-                    required
-                    rows={5}
-                    placeholder="Describe brevemente qué necesitas, plazos, requisitos específicos..."
-                  ></textarea>
-                </div>
+
+                {formData.tipoServicio === "TFG" && (
+                  <>
+                    <div className="form-group">
+                      <label htmlFor="tipoProyecto">Tipo de proyecto *</label>
+                      <select
+                        id="tipoProyecto"
+                        name="tipoProyecto"
+                        value={formData.tipoProyecto}
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="">Selecciona una opción</option>
+                        <option value="TFG">TFG (Trabajo Fin de Grado)</option>
+                        <option value="practicas">Prácticas de módulo</option>
+                        <option value="proyecto">Proyecto académico</option>
+                        <option value="otro">Otro</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="grado">Grado o ciclo *</label>
+                      <select
+                        id="grado"
+                        name="grado"
+                        value={formData.grado}
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="">Selecciona una opción</option>
+                        <option value="DAM">
+                          DAM (Desarrollo de Aplicaciones Multiplataforma)
+                        </option>
+                        <option value="DAW">
+                          DAW (Desarrollo de Aplicaciones Web)
+                        </option>
+                        <option value="ingenieria-informatica">
+                          Ingeniería Informática
+                        </option>
+                        <option value="ingenieria-software">
+                          Ingeniería del Software
+                        </option>
+                        <option value="otro">Otro grado tecnológico</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="mensaje">
+                        Cuéntanos sobre tu proyecto *
+                      </label>
+                      <textarea
+                        id="mensaje"
+                        name="mensaje"
+                        value={formData.mensaje}
+                        onChange={handleChange}
+                        required
+                        rows={5}
+                        placeholder="Describe brevemente qué necesitas, plazos, requisitos específicos..."
+                      ></textarea>
+                    </div>
+                  </>
+                )}
+
+                {formData.tipoServicio === "Clases Particulares" && (
+                  <>
+                    <div className="form-group">
+                      <label htmlFor="tema">¿Qué quieres aprender? *</label>
+                      <select
+                        id="tema"
+                        name="tema"
+                        value={formData.tema}
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="">Selecciona un área</option>
+                        <option value="java">Java</option>
+                        <option value="python">Python</option>
+                        <option value="javascript">
+                          JavaScript / TypeScript
+                        </option>
+                        <option value="web">
+                          Desarrollo Web (HTML, CSS, React, Angular...)
+                        </option>
+                        <option value="movil">
+                          Desarrollo Móvil (Android, iOS, Flutter...)
+                        </option>
+                        <option value="bbdd">
+                          Bases de Datos (SQL, MongoDB...)
+                        </option>
+                        <option value="csharp">C# / .NET</option>
+                        <option value="devops">DevOps / Cloud</option>
+                        <option value="ia">
+                          Inteligencia Artificial / Machine Learning
+                        </option>
+                        <option value="otro">Otro</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="mensaje">
+                        Describe tu situación y objetivos *
+                      </label>
+                      <textarea
+                        id="mensaje"
+                        name="mensaje"
+                        value={formData.mensaje}
+                        onChange={handleChange}
+                        required
+                        rows={4}
+                        placeholder="Tu nivel actual, qué necesitas aprender, si tienes prácticas o proyectos pendientes, disponibilidad horaria..."
+                      ></textarea>
+                    </div>
+                  </>
+                )}
+
                 <div className="form-group checkbox-group">
                   <label className="checkbox-label">
                     <input
@@ -817,205 +955,144 @@ function App() {
         </div>
       </section>
 
-      {/* Clases particulares */}
-      <section id="clases" className="clases">
+      {/* Anchor for clases link */}
+      <div id="clases"></div>
+
+      {/* Trabaja con nosotros */}
+      <section id="trabaja" className="work-with-us">
         <div className="container">
-          <div className="section-header">
-            <h2>Clases particulares de programación</h2>
-            <p>
-              Aprende con profesionales en activo que se adaptan a tu ritmo y
-              objetivos
-            </p>
-          </div>
-
-          <div className="clases-content">
-            <div className="clases-info">
-              <div className="clases-features-grid">
-                <div className="clases-feature-card">
-                  <div className="clases-feature-icon">
-                    <svg
-                      width="32"
-                      height="32"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="9" cy="7" r="4"></circle>
-                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
+          <div className="work-wrapper">
+            <div className="work-info">
+              <h2>Únete a nuestro equipo</h2>
+              <p>
+                Buscamos profesionales en activo que quieran formar parte de
+                nuestro equipo de profesores y desarrolladores. Si te apasiona
+                la enseñanza y el desarrollo, ¡queremos conocerte!
+              </p>
+              <div className="work-features">
+                <div className="work-feature">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                    <path d="M2 17l10 5 10-5"></path>
+                    <path d="M2 12l10 5 10-5"></path>
+                  </svg>
+                  <div>
+                    <h3>Flexibilidad</h3>
+                    <p>Trabaja desde donde quieras, a tu ritmo</p>
                   </div>
-                  <h3>Profesionales en activo</h3>
-                  <p>
-                    Contamos con un equipo de desarrolladores e ingenieros que
-                    trabajan en empresas tecnológicas. Encontramos al
-                    profesional que mejor se adapte a tu necesidad concreta.
-                  </p>
                 </div>
-
-                <div className="clases-feature-card">
-                  <div className="clases-feature-icon">
-                    <svg
-                      width="32"
-                      height="32"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
+                <div className="work-feature">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <circle cx="12" cy="8" r="7"></circle>
+                    <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                  </svg>
+                  <div>
+                    <h3>Proyectos interesantes</h3>
+                    <p>Desarrollos reales y desafiantes</p>
                   </div>
-                  <h3>Horarios flexibles</h3>
-                  <p>
-                    Clases online adaptadas a tu disponibilidad. Sesiones
-                    individuales para maximizar tu aprendizaje.
-                  </p>
                 </div>
-
-                <div className="clases-feature-card">
-                  <div className="clases-feature-icon">
-                    <svg
-                      width="32"
-                      height="32"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <polyline points="16 18 22 12 16 6"></polyline>
-                      <polyline points="8 6 2 12 8 18"></polyline>
-                    </svg>
+                <div className="work-feature">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                  <div>
+                    <h3>Equipo profesional</h3>
+                    <p>Colabora con desarrolladores experimentados</p>
                   </div>
-                  <h3>Cualquier tecnología</h3>
-                  <p>
-                    Java, Python, JavaScript, C#, React, Angular, bases de
-                    datos, DevOps, IA... Cubrimos todas las áreas de la
-                    programación.
-                  </p>
-                </div>
-
-                <div className="clases-feature-card">
-                  <div className="clases-feature-icon">
-                    <svg
-                      width="32"
-                      height="32"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                      <polyline points="14 2 14 8 20 8"></polyline>
-                      <line x1="16" y1="13" x2="8" y2="13"></line>
-                      <line x1="16" y1="17" x2="8" y2="17"></line>
-                    </svg>
-                  </div>
-                  <h3>Prácticas y proyectos</h3>
-                  <p>
-                    Te ayudamos con tus prácticas y proyectos académicos
-                    mientras aprendes de verdad, no solo a entregar.
-                  </p>
                 </div>
               </div>
             </div>
-
-            <div className="clases-form-wrapper">
-              <h3>Cuéntanos qué necesitas</h3>
-              <p className="clases-form-subtitle">
-                Nos ponemos en contacto contigo y te asignamos al profesional
-                que mejor se adapte a tus objetivos.
-              </p>
-              <form className="contact-form" onSubmit={handleClasesSubmit}>
+            <div className="work-form-wrapper">
+              <form className="work-form" onSubmit={handleTrabajoSubmit}>
+                <h3>Envíanos tu solicitud</h3>
                 <div className="form-group">
-                  <label htmlFor="clases-nombre">Nombre *</label>
+                  <label htmlFor="trabajoNombre">Nombre completo *</label>
                   <input
                     type="text"
-                    id="clases-nombre"
+                    id="trabajoNombre"
                     name="nombre"
-                    value={clasesFormData.nombre}
-                    onChange={handleClasesChange}
+                    value={trabajoFormData.nombre}
+                    onChange={handleTrabajoChange}
                     required
-                    placeholder="Tu nombre"
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="clases-email">Email *</label>
+                  <label htmlFor="trabajoEmail">Email *</label>
                   <input
                     type="email"
-                    id="clases-email"
+                    id="trabajoEmail"
                     name="email"
-                    value={clasesFormData.email}
-                    onChange={handleClasesChange}
+                    value={trabajoFormData.email}
+                    onChange={handleTrabajoChange}
                     required
-                    placeholder="tu@email.com"
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="clases-telefono">Teléfono</label>
+                  <label htmlFor="trabajoTelefono">Teléfono</label>
                   <input
                     type="tel"
-                    id="clases-telefono"
+                    id="trabajoTelefono"
                     name="telefono"
-                    value={clasesFormData.telefono}
-                    onChange={handleClasesChange}
-                    placeholder="Tu número de teléfono"
+                    value={trabajoFormData.telefono}
+                    onChange={handleTrabajoChange}
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="clases-tema">¿Qué quieres aprender? *</label>
-                  <select
-                    id="clases-tema"
-                    name="tema"
-                    value={clasesFormData.tema}
-                    onChange={handleClasesChange}
-                    required
-                  >
-                    <option value="">Selecciona un área</option>
-                    <option value="java">Java</option>
-                    <option value="python">Python</option>
-                    <option value="javascript">JavaScript / TypeScript</option>
-                    <option value="web">
-                      Desarrollo Web (HTML, CSS, React, Angular...)
-                    </option>
-                    <option value="movil">
-                      Desarrollo Móvil (Android, iOS, Flutter...)
-                    </option>
-                    <option value="bbdd">
-                      Bases de Datos (SQL, MongoDB...)
-                    </option>
-                    <option value="csharp">C# / .NET</option>
-                    <option value="devops">DevOps / Cloud</option>
-                    <option value="ia">
-                      Inteligencia Artificial / Machine Learning
-                    </option>
-                    <option value="otro">Otro</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="clases-mensaje">
-                    Describe tu situación y objetivos *
+                  <label htmlFor="trabajoDescripcion">
+                    Cuéntanos sobre ti y qué sabes hacer *
                   </label>
                   <textarea
-                    id="clases-mensaje"
-                    name="mensaje"
-                    value={clasesFormData.mensaje}
-                    onChange={handleClasesChange}
+                    id="trabajoDescripcion"
+                    name="descripcion"
+                    rows={6}
+                    value={trabajoFormData.descripcion}
+                    onChange={handleTrabajoChange}
+                    placeholder="Háblanos de tu experiencia, tecnologías que dominas, proyectos en los que has trabajado..."
                     required
-                    rows={4}
-                    placeholder="Tu nivel actual, qué necesitas aprender, si tienes prácticas o proyectos pendientes, disponibilidad horaria..."
                   ></textarea>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="trabajoLinkedin">Perfil de LinkedIn</label>
+                  <input
+                    type="url"
+                    id="trabajoLinkedin"
+                    name="linkedin"
+                    value={trabajoFormData.linkedin}
+                    onChange={handleTrabajoChange}
+                    placeholder="https://www.linkedin.com/in/tu-perfil"
+                  />
                 </div>
                 <div className="form-group checkbox-group">
                   <label className="checkbox-label">
                     <input
                       type="checkbox"
                       name="aceptaPrivacidad"
-                      checked={clasesFormData.aceptaPrivacidad}
-                      onChange={handleClasesChange}
+                      checked={trabajoFormData.aceptaPrivacidad}
+                      onChange={handleTrabajoChange}
                       required
                     />
                     <span>
@@ -1042,13 +1119,13 @@ function App() {
                   type="submit"
                   className="btn-submit"
                   disabled={
-                    isSubmittingClases || !clasesFormData.aceptaPrivacidad
+                    isSubmittingTrabajo || !trabajoFormData.aceptaPrivacidad
                   }
                 >
-                  {isSubmittingClases ? "Enviando..." : "Solicitar información"}
+                  {isSubmittingTrabajo ? "Enviando..." : "Enviar solicitud"}
                 </button>
-                {submitMessageClases && (
-                  <p className="submit-message">{submitMessageClases}</p>
+                {submitMessageTrabajo && (
+                  <p className="submit-message">{submitMessageTrabajo}</p>
                 )}
               </form>
             </div>
@@ -1095,6 +1172,9 @@ function App() {
                 </li>
                 <li>
                   <a href="#contacto">Contacto</a>
+                </li>
+                <li>
+                  <a href="#trabaja">Trabaja con nosotros</a>
                 </li>
               </ul>
             </div>
