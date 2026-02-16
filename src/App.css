@@ -229,6 +229,7 @@
   width: auto;
   object-fit: contain;
   z-index: 1;
+  pointer-events: none;
 }
 
 .hero-student-image-left {
@@ -240,6 +241,15 @@
   object-fit: contain;
   object-position: bottom left;
   z-index: 1;
+  pointer-events: none;
+}
+
+/* Ajustar tamaño en portátiles */
+@media (max-width: 1780px) {
+  .hero-student-image,
+  .hero-student-image-left {
+    height: 250px;
+  }
 }
 
 .hero-title {
@@ -488,6 +498,16 @@
   width: auto;
   object-fit: contain;
   z-index: 1;
+  pointer-events: none;
+}
+
+/* Ajustar tamaño y posición en portátiles */
+@media (max-width: 1780px) {
+  .how-it-works-student-image {
+    height: 220px;
+    right: 20px;
+    bottom: 400px;
+  }
 }
 
 .roadmap {
@@ -643,6 +663,16 @@
   width: auto;
   object-fit: contain;
   z-index: 1;
+  pointer-events: none;
+}
+
+/* Ajustar tamaño y posición en portátiles */
+@media (max-width: 1780px) {
+  .advantages-student-image {
+    height: 220px;
+    left: -30px;
+    bottom: 400px;
+  }
 }
 
 .advantages::before {
@@ -1020,6 +1050,15 @@
   height: 350px;
   width: auto;
   object-fit: contain;
+  pointer-events: none;
+}
+
+/* Ajustar tamaño en portátiles */
+@media (max-width: 1780px) {
+  .contact-student-image {
+    height: 220px;
+    margin-top: 250px;
+  }
 }
 
 .contact-form-wrapper {
