@@ -1212,7 +1212,12 @@
 ============================================ */
 .work-with-us {
   padding: var(--spacing-3xl) 0;
-  background-color: var(--color-bg-light);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-primary-dark) 100%
+  );
+  color: white;
 }
 
 .work-wrapper {
@@ -1225,12 +1230,12 @@
 .work-info h2 {
   font-size: clamp(1.75rem, 3vw, 2.25rem);
   margin-bottom: var(--spacing-md);
-  color: var(--color-secondary);
+  color: white;
 }
 
 .work-info > p {
   font-size: 1.125rem;
-  color: var(--color-text-light);
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: var(--spacing-xl);
   line-height: 1.7;
 }
@@ -1249,19 +1254,19 @@
 
 .work-feature svg {
   flex-shrink: 0;
-  color: var(--color-primary);
+  color: rgba(255, 255, 255, 0.9);
   margin-top: 4px;
 }
 
 .work-feature h3 {
   font-size: 1.125rem;
-  color: var(--color-secondary);
+  color: white;
   margin-bottom: var(--spacing-xs);
   font-weight: 600;
 }
 
 .work-feature p {
-  color: var(--color-text-light);
+  color: rgba(255, 255, 255, 0.8);
   line-height: 1.6;
 }
 
