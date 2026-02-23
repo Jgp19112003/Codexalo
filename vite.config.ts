@@ -7,13 +7,7 @@ export default defineConfig({
   build: {
     // Optimizaciones para SEO y rendimiento
     cssCodeSplit: true,
-    minify: "terser",
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-      },
-    },
+    minify: "esbuild",
     rollupOptions: {
       output: {
         manualChunks: {
@@ -24,11 +18,5 @@ export default defineConfig({
     // Mejorar caché
     assetsInlineLimit: 4096,
     chunkSizeWarningLimit: 500,
-  },
-  // Precargar fuentes y recursos
-  server: {
-    headers: {
-      "Cache-Control": "public, max-age=31536000",
-    },
   },
 });
