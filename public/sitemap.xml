@@ -1,61 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   
   <!-- Página principal -->
   <url>
-    <loc>https://codexalo.es/</loc>
-    <lastmod>2026-02-10</lastmod>
-    <changefreq>weekly</changefreq>
+    <loc>https://codexalo.com/</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://codexalo.com/og-image.jpg</image:loc>
+      <image:title>Codexalo - TFG DAM DAW y Clases de Programación</image:title>
+    </image:image>
   </url>
   
   <!-- Servicios TFG -->
   <url>
-    <loc>https://codexalo.es/#servicios</loc>
-    <lastmod>2026-02-10</lastmod>
+    <loc>https://codexalo.com/#servicios</loc>
+    <lastmod>2026-02-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <!-- Contacto TFG -->
   <url>
-    <loc>https://codexalo.es/#contacto</loc>
-    <lastmod>2026-02-10</lastmod>
-    <changefreq>monthly</changefreq>
+    <loc>https://codexalo.com/#contacto</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <!-- Clases particulares -->
   <url>
-    <loc>https://codexalo.es/#clases</loc>
-    <lastmod>2026-02-10</lastmod>
+    <loc>https://codexalo.com/#clases</loc>
+    <lastmod>2026-02-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <!-- Cómo funciona -->
   <url>
-    <loc>https://codexalo.es/#como-funciona</loc>
-    <lastmod>2026-02-10</lastmod>
+    <loc>https://codexalo.com/#como-funciona</loc>
+    <lastmod>2026-02-23</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
   
   <!-- Ventajas -->
   <url>
-    <loc>https://codexalo.es/#ventajas</loc>
-    <lastmod>2026-02-10</lastmod>
+    <loc>https://codexalo.com/#ventajas</loc>
+    <lastmod>2026-02-23</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
   
   <!-- Garantía -->
   <url>
-    <loc>https://codexalo.es/#garantia</loc>
-    <lastmod>2026-02-10</lastmod>
+    <loc>https://codexalo.com/#garantia</loc>
+    <lastmod>2026-02-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+  
+  <!-- Trabaja con nosotros -->
+  <url>
+    <loc>https://codexalo.com/#trabaja</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 
 </urlset>

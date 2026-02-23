@@ -1,0 +1,16 @@
+/* TEAM */
+Developer: Codexalo Team
+Contact: codexalo.contact@gmail.com
+Site: https://codexalo.com
+Location: España
+
+/* SITE */
+Last update: 2026/02/23
+Standards: HTML5, CSS3, JavaScript, React
+Components: React, TypeScript, Vite
+Software: VS Code, Git
+
+/* SERVICES */
+TFG DAM/DAW Development
+Private Programming Classes
+Academic Software Development

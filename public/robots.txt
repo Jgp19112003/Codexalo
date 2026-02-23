@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://codexalo.es/sitemap.xml
+Sitemap: https://codexalo.com/sitemap.xml
 
 # Crawl-delay para bots
 Crawl-delay: 0
