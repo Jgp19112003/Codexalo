@@ -1,6 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import emailjs from "@emailjs/browser";
 import "./App.css";
+
+type Review = {
+  nombre: string;
+  proyecto: string;
+  opinion: string;
+};
+
+const REVIEW_FORM_ANCHOR = "review-form";
+const REVIEW_FORM_HASH = `#${REVIEW_FORM_ANCHOR}`;
+const REVIEW_TEMPLATE_ID = "template_udargge";
 
 function App() {
   const [formData, setFormData] = useState({
@@ -24,12 +34,65 @@ function App() {
     aceptaPrivacidad: false,
   });
 
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsError, setReviewsError] = useState("");
+  const [reviewFormData, setReviewFormData] = useState({
+    nombre: "",
+    proyecto: "",
+    opinion: "",
+    aceptaPrivacidad: false,
+  });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
   const [isSubmittingTrabajo, setIsSubmittingTrabajo] = useState(false);
   const [submitMessageTrabajo, setSubmitMessageTrabajo] = useState("");
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [submitMessageReview, setSubmitMessageReview] = useState("");
   const [modalAbierto, setModalAbierto] = useState<string | null>(null);
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
+  const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
+
+  useEffect(() => {
+    const loadReviews = async () => {
+      try {
+        const response = await fetch("/reviews.json", { cache: "no-store" });
+
+        if (!response.ok) {
+          throw new Error("No se pudo cargar reviews.json");
+        }
+
+        const data = await response.json();
+        const parsedReviews = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.reviews)
+            ? data.reviews
+            : [];
+
+        setReviews(parsedReviews);
+      } catch (error) {
+        console.error("Error al cargar reviews:", error);
+        setReviewsError(
+          "No pudimos cargar las opiniones en este momento. Intenta más tarde.",
+        );
+      }
+    };
+
+    loadReviews();
+  }, []);
+
+  useEffect(() => {
+    const updateVisibility = () => {
+      setIsReviewFormVisible(window.location.hash === REVIEW_FORM_HASH);
+    };
+
+    updateVisibility();
+    window.addEventListener("hashchange", updateVisibility);
+
+    return () => {
+      window.removeEventListener("hashchange", updateVisibility);
+    };
+  }, []);
 
   const toggleMenuMovil = () => {
     setMenuMovilAbierto(!menuMovilAbierto);
@@ -121,6 +184,19 @@ function App() {
     });
   };
 
+  const handleReviewChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
+    const { name, value, type } = e.target;
+    setReviewFormData({
+      ...reviewFormData,
+      [name]:
+        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
+    });
+  };
+
   const handleTrabajoSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmittingTrabajo(true);
@@ -164,6 +240,43 @@ function App() {
     }
   };
 
+  const handleReviewSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmittingReview(true);
+    setSubmitMessageReview("");
+
+    try {
+      const templateParams = {
+        name: reviewFormData.nombre,
+        proyecto: reviewFormData.proyecto,
+        opinion: reviewFormData.opinion,
+        time: new Date().toLocaleString("es-ES"),
+      };
+
+      await emailjs.send(
+        "service_b49t2r7",
+        REVIEW_TEMPLATE_ID,
+        templateParams,
+        "w84e7dOMfq4ju3Ons",
+      );
+
+      setSubmitMessageReview("Gracias por tu opinión.");
+      setReviewFormData({
+        nombre: "",
+        proyecto: "",
+        opinion: "",
+        aceptaPrivacidad: false,
+      });
+    } catch (error) {
+      console.error("Error al enviar la review:", error);
+      setSubmitMessageReview(
+        "Hubo un error al enviar tu opinión. Por favor, inténtalo de nuevo.",
+      );
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
   const abrirModal = (tipo: string) => {
     setModalAbierto(tipo);
     document.body.style.overflow = "hidden";
@@ -173,6 +286,405 @@ function App() {
     setModalAbierto(null);
     document.body.style.overflow = "auto";
   };
+
+  const reviewFormSection = (
+    <section id={REVIEW_FORM_ANCHOR} className="review-form">
+      <div className="container">
+        <div className="review-form-wrapper">
+          <div className="review-form-info">
+            <h2>Enviar opinión</h2>
+            <p>
+              Este formulario es para recopilar opiniones que revisaremos
+              manualmente antes de publicarlas.
+            </p>
+          </div>
+          <div className="review-form-card">
+            <form className="review-form-fields" onSubmit={handleReviewSubmit}>
+              <div className="form-group">
+                <label htmlFor="reviewNombre">Nombre *</label>
+                <input
+                  type="text"
+                  id="reviewNombre"
+                  name="nombre"
+                  value={reviewFormData.nombre}
+                  onChange={handleReviewChange}
+                  required
+                  placeholder="Tu nombre"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="reviewProyecto">Proyecto *</label>
+                <input
+                  type="text"
+                  id="reviewProyecto"
+                  name="proyecto"
+                  value={reviewFormData.proyecto}
+                  onChange={handleReviewChange}
+                  required
+                  placeholder="TFG, proyecto académico, clases..."
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="reviewOpinion">Opinión *</label>
+                <textarea
+                  id="reviewOpinion"
+                  name="opinion"
+                  value={reviewFormData.opinion}
+                  onChange={handleReviewChange}
+                  required
+                  rows={5}
+                  placeholder="Cuenta tu experiencia con detalle"
+                ></textarea>
+              </div>
+              <div className="form-group checkbox-group">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    name="aceptaPrivacidad"
+                    checked={reviewFormData.aceptaPrivacidad}
+                    onChange={handleReviewChange}
+                    required
+                  />
+                  <span>
+                    He leído y acepto la{" "}
+                    <button
+                      type="button"
+                      className="link-button"
+                      onClick={() => abrirModal("privacidad")}
+                    >
+                      Política de Privacidad
+                    </button>{" "}
+                    y el{" "}
+                    <button
+                      type="button"
+                      className="link-button"
+                      onClick={() => abrirModal("aviso-legal")}
+                    >
+                      Aviso Legal
+                    </button>
+                  </span>
+                </label>
+              </div>
+              <button
+                type="submit"
+                className="btn-submit"
+                disabled={
+                  isSubmittingReview || !reviewFormData.aceptaPrivacidad
+                }
+              >
+                {isSubmittingReview ? "Enviando..." : "Enviar opinión"}
+              </button>
+              {submitMessageReview && (
+                <p className="submit-message">{submitMessageReview}</p>
+              )}
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+
+  const legalModals = modalAbierto ? (
+    <div className="modal-overlay" onClick={cerrarModal}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={cerrarModal}>
+          ✕
+        </button>
+        {modalAbierto === "aviso-legal" && (
+          <div className="legal-content">
+            <h2>Aviso Legal</h2>
+            <p className="legal-intro">
+              En cumplimiento de lo establecido en la Ley 34/2002, de 11 de
+              julio, de Servicios de la Sociedad de la Información y de Comercio
+              Electrónico (LSSI-CE), se informa de los siguientes datos:
+            </p>
+
+            <h3>1. Datos identificativos</h3>
+            <p>
+              <strong>Titular:</strong> Codexalo
+              <br />
+              <strong>Actividad:</strong> Servicios de desarrollo de proyectos
+              académicos y software
+              <br />
+              <strong>Email de contacto:</strong> codexalo.contact@gmail.com
+            </p>
+
+            <h3>2. Objeto</h3>
+            <p>
+              El presente aviso legal regula el uso del sitio web codexalo.es
+              (en adelante, LA WEB), del que es titular Codexalo.
+            </p>
+            <p>
+              La navegación por LA WEB atribuye la condición de usuario de la
+              misma e implica la aceptación plena y sin reservas de todas y cada
+              una de las disposiciones incluidas en este Aviso Legal.
+            </p>
+
+            <h3>3. Condiciones de uso</h3>
+            <p>
+              El usuario se compromete a hacer un uso adecuado de los contenidos
+              y servicios que se ofrecen a través de LA WEB y a no emplearlos
+              para:
+            </p>
+            <ul>
+              <li>
+                Difundir contenidos delictivos, violentos, pornográficos,
+                racistas, xenófobos, ofensivos o que atenten contra la moral.
+              </li>
+              <li>
+                Provocar daños en los sistemas físicos y lógicos del titular, de
+                sus proveedores o de terceras personas.
+              </li>
+              <li>
+                Introducir o difundir virus informáticos o cualesquiera otros
+                sistemas que sean susceptibles de provocar daños.
+              </li>
+            </ul>
+
+            <h3>4. Propiedad intelectual e industrial</h3>
+            <p>
+              Todos los contenidos de LA WEB, incluyendo, sin carácter
+              limitativo, textos, fotografías, gráficos, imágenes, iconos,
+              tecnología, software, links y demás contenidos audiovisuales o
+              sonoros, así como su diseño gráfico y códigos fuente, son
+              propiedad de Codexalo o de terceros, sin que puedan entenderse
+              cedidos al usuario ninguno de los derechos de explotación
+              reconocidos por la normativa vigente en materia de propiedad
+              intelectual sobre los mismos.
+            </p>
+
+            <h3>5. Responsabilidad</h3>
+            <p>
+              Codexalo no se hace responsable del uso que los usuarios puedan
+              hacer de los materiales publicados que vulnere los derechos de
+              propiedad intelectual o industrial de terceros.
+            </p>
+            <p>
+              Codexalo se reserva el derecho a modificar cualquier tipo de
+              información que pudiera aparecer en LA WEB, sin que exista
+              obligación de preavisar o poner en conocimiento de los usuarios
+              dichas modificaciones.
+            </p>
+
+            <h3>6. Legislación aplicable</h3>
+            <p>
+              Las presentes condiciones se regirán por la legislación española
+              vigente. Para la resolución de cualquier controversia, las partes
+              se someten a los Juzgados y Tribunales del domicilio del usuario.
+            </p>
+          </div>
+        )}
+
+        {modalAbierto === "privacidad" && (
+          <div className="legal-content">
+            <h2>Política de Privacidad</h2>
+            <p className="legal-intro">
+              En cumplimiento del Reglamento (UE) 2016/679 del Parlamento
+              Europeo y del Consejo, de 27 de abril de 2016, relativo a la
+              protección de las personas físicas en lo que respecta al
+              tratamiento de datos personales (RGPD) y de la Ley Orgánica
+              3/2018, de 5 de diciembre, de Protección de Datos Personales y
+              garantía de los derechos digitales (LOPDGDD), le informamos de lo
+              siguiente:
+            </p>
+
+            <h3>1. Responsable del tratamiento</h3>
+            <p>
+              <strong>Identidad:</strong> Codexalo
+              <br />
+              <strong>Email de contacto:</strong> codexalo.contact@gmail.com
+            </p>
+
+            <h3>2. Finalidad del tratamiento</h3>
+            <p>
+              Los datos personales que nos facilite serán tratados con las
+              siguientes finalidades:
+            </p>
+            <ul>
+              <li>
+                Responder a las consultas y solicitudes de información
+                realizadas a través del formulario de contacto.
+              </li>
+              <li>
+                Gestión y desarrollo de la relación contractual para la
+                prestación de servicios de desarrollo de proyectos académicos.
+              </li>
+              <li>
+                Envío de presupuestos personalizados y comunicaciones
+                relacionadas con el servicio solicitado.
+              </li>
+            </ul>
+
+            <h3>3. Legitimación</h3>
+            <p>
+              La base legal para el tratamiento de sus datos es el
+              consentimiento del interesado (artículo 6.1.a RGPD) y la ejecución
+              de un contrato o medidas precontractuales (artículo 6.1.b RGPD).
+            </p>
+
+            <h3>4. Destinatarios</h3>
+            <p>
+              Sus datos no serán cedidos a terceros, salvo obligación legal. No
+              se realizan transferencias internacionales de datos.
+            </p>
+
+            <h3>5. Conservación de los datos</h3>
+            <p>
+              Los datos personales se conservarán mientras se mantenga la
+              relación comercial o durante el tiempo necesario para cumplir con
+              las obligaciones legales. Una vez finalizada la relación, los
+              datos se conservarán bloqueados durante los plazos establecidos
+              por la legislación aplicable.
+            </p>
+
+            <h3>6. Derechos de los interesados</h3>
+            <p>Usted tiene derecho a:</p>
+            <ul>
+              <li>
+                <strong>Acceso:</strong> Conocer qué datos personales estamos
+                tratando sobre usted.
+              </li>
+              <li>
+                <strong>Rectificación:</strong> Solicitar la corrección de datos
+                inexactos o incompletos.
+              </li>
+              <li>
+                <strong>Supresión:</strong> Solicitar la eliminación de sus
+                datos cuando ya no sean necesarios.
+              </li>
+              <li>
+                <strong>Oposición:</strong> Oponerse al tratamiento de sus
+                datos.
+              </li>
+              <li>
+                <strong>Limitación:</strong> Solicitar la limitación del
+                tratamiento de sus datos.
+              </li>
+              <li>
+                <strong>Portabilidad:</strong> Recibir sus datos en un formato
+                estructurado y de uso común.
+              </li>
+            </ul>
+            <p>
+              Para ejercer estos derechos, puede dirigirse a
+              codexalo.contact@gmail.com. También tiene derecho a presentar una
+              reclamación ante la Agencia Española de Protección de Datos
+              (www.aepd.es).
+            </p>
+
+            <h3>7. Seguridad de los datos</h3>
+            <p>
+              Codexalo ha adoptado las medidas técnicas y organizativas
+              necesarias para garantizar la seguridad de los datos personales y
+              evitar su alteración, pérdida, tratamiento o acceso no autorizado.
+            </p>
+
+            <h3>8. Datos de menores</h3>
+            <p>
+              Los servicios ofrecidos en esta web están dirigidos a personas
+              mayores de 18 años. No se recopilan datos de menores de edad de
+              forma intencionada.
+            </p>
+          </div>
+        )}
+
+        {modalAbierto === "cookies" && (
+          <div className="legal-content">
+            <h2>Política de Cookies</h2>
+            <p className="legal-intro">
+              En cumplimiento de lo dispuesto en el artículo 22.2 de la Ley
+              34/2002, de 11 de julio, de Servicios de la Sociedad de la
+              Información y de Comercio Electrónico (LSSI-CE), Codexalo informa
+              sobre las cookies utilizadas en este sitio web.
+            </p>
+
+            <h3>¿Qué son las cookies?</h3>
+            <p>
+              Una cookie es un fichero que se descarga en su ordenador al
+              acceder a determinadas páginas web. Las cookies permiten a una
+              página web, entre otras cosas, almacenar y recuperar información
+              sobre los hábitos de navegación de un usuario o de su equipo y,
+              dependiendo de la información que contengan y de la forma en que
+              utilice su equipo, pueden utilizarse para reconocer al usuario.
+            </p>
+
+            <h3>Tipos de cookies utilizadas</h3>
+
+            <h4>Cookies técnicas (necesarias)</h4>
+            <p>
+              Son aquellas que permiten al usuario la navegación a través del
+              sitio web y la utilización de las diferentes opciones o servicios
+              que en ella existen. Este sitio web utiliza cookies técnicas
+              imprescindibles para el correcto funcionamiento de la página.
+            </p>
+
+            <h4>Cookies de análisis</h4>
+            <p>
+              Actualmente, este sitio web no utiliza cookies de análisis ni de
+              terceros. En caso de incorporarse en el futuro, se solicitará el
+              consentimiento previo del usuario.
+            </p>
+
+            <h3>Gestión de cookies</h3>
+            <p>
+              Usted puede permitir, bloquear o eliminar las cookies instaladas
+              en su equipo mediante la configuración de las opciones de su
+              navegador de Internet. En caso de que no permita la instalación de
+              cookies en su navegador, es posible que no pueda acceder a alguna
+              de las funcionalidades del sitio web.
+            </p>
+
+            <h4>Cómo configurar las cookies en los navegadores principales:</h4>
+            <ul>
+              <li>
+                <strong>Chrome:</strong> Configuración &gt; Privacidad y
+                seguridad &gt; Cookies y otros datos de sitios
+              </li>
+              <li>
+                <strong>Firefox:</strong> Opciones &gt; Privacidad y seguridad
+                &gt; Cookies y datos del sitio web
+              </li>
+              <li>
+                <strong>Safari:</strong> Preferencias &gt; Privacidad &gt;
+                Cookies y datos de sitios web
+              </li>
+              <li>
+                <strong>Edge:</strong> Configuración &gt; Cookies y permisos del
+                sitio &gt; Cookies y datos de sitios almacenados
+              </li>
+            </ul>
+
+            <h3>Actualización de la política de cookies</h3>
+            <p>
+              Codexalo puede modificar esta Política de Cookies en función de
+              exigencias legislativas, reglamentarias, o con la finalidad de
+              adaptar dicha política a las instrucciones dictadas por la Agencia
+              Española de Protección de Datos.
+            </p>
+            <p>
+              Cuando se produzcan cambios significativos en esta Política de
+              Cookies, se comunicará a los usuarios a través de la web.
+            </p>
+
+            <h3>Más información</h3>
+            <p>
+              Si tiene dudas acerca de esta política de cookies, puede contactar
+              con Codexalo en codexalo.contact@gmail.com
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  ) : null;
+
+  if (isReviewFormVisible) {
+    return (
+      <div className="landing-page review-only">
+        {reviewFormSection}
+        {legalModals}
+      </div>
+    );
+  }
 
   return (
     <div className="landing-page">
@@ -213,8 +725,8 @@ function App() {
               <a href="#como-funciona" onClick={cerrarMenuMovil}>
                 Cómo funciona
               </a>
-              <a href="#ventajas" onClick={cerrarMenuMovil}>
-                Ventajas
+              <a href="#opiniones" onClick={cerrarMenuMovil}>
+                Opiniones
               </a>
               <a href="#garantia" onClick={cerrarMenuMovil}>
                 Garantía
@@ -958,6 +1470,40 @@ function App() {
       {/* Anchor for clases link */}
       <div id="clases"></div>
 
+      {/* Opiniones */}
+      <section id="opiniones" className="reviews">
+        <div className="container">
+          <div className="section-header">
+            <h2>Opiniones reales</h2>
+            <p>Reseñas verificadas de alumnos y proyectos reales</p>
+          </div>
+
+          {reviewsError ? (
+            <p className="reviews-error">{reviewsError}</p>
+          ) : reviews.length === 0 ? (
+            <p className="reviews-empty">
+              Aún no hay opiniones publicadas. Si ya enviaste la tuya, la
+              añadiremos pronto.
+            </p>
+          ) : (
+            <div className="reviews-grid">
+              {reviews.map((review, index) => (
+                <article
+                  className="review-card"
+                  key={`${review.nombre}-${index}`}
+                >
+                  <p className="review-opinion">“{review.opinion}”</p>
+                  <div className="review-meta">
+                    <span className="review-name">{review.nombre}</span>
+                    <span className="review-project">{review.proyecto}</span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* Trabaja con nosotros */}
       <section id="trabaja" className="work-with-us">
         <div className="container">
@@ -1216,313 +1762,7 @@ function App() {
           </div>
         </div>
       </footer>
-
-      {/* Modales legales */}
-      {modalAbierto && (
-        <div className="modal-overlay" onClick={cerrarModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={cerrarModal}>
-              ✕
-            </button>
-            {modalAbierto === "aviso-legal" && (
-              <div className="legal-content">
-                <h2>Aviso Legal</h2>
-                <p className="legal-intro">
-                  En cumplimiento de lo establecido en la Ley 34/2002, de 11 de
-                  julio, de Servicios de la Sociedad de la Información y de
-                  Comercio Electrónico (LSSI-CE), se informa de los siguientes
-                  datos:
-                </p>
-
-                <h3>1. Datos identificativos</h3>
-                <p>
-                  <strong>Titular:</strong> Codexalo
-                  <br />
-                  <strong>Actividad:</strong> Servicios de desarrollo de
-                  proyectos académicos y software
-                  <br />
-                  <strong>Email de contacto:</strong> codexalo.contact@gmail.com
-                </p>
-
-                <h3>2. Objeto</h3>
-                <p>
-                  El presente aviso legal regula el uso del sitio web
-                  codexalo.es (en adelante, LA WEB), del que es titular
-                  Codexalo.
-                </p>
-                <p>
-                  La navegación por LA WEB atribuye la condición de usuario de
-                  la misma e implica la aceptación plena y sin reservas de todas
-                  y cada una de las disposiciones incluidas en este Aviso Legal.
-                </p>
-
-                <h3>3. Condiciones de uso</h3>
-                <p>
-                  El usuario se compromete a hacer un uso adecuado de los
-                  contenidos y servicios que se ofrecen a través de LA WEB y a
-                  no emplearlos para:
-                </p>
-                <ul>
-                  <li>
-                    Difundir contenidos delictivos, violentos, pornográficos,
-                    racistas, xenófobos, ofensivos o que atenten contra la
-                    moral.
-                  </li>
-                  <li>
-                    Provocar daños en los sistemas físicos y lógicos del
-                    titular, de sus proveedores o de terceras personas.
-                  </li>
-                  <li>
-                    Introducir o difundir virus informáticos o cualesquiera
-                    otros sistemas que sean susceptibles de provocar daños.
-                  </li>
-                </ul>
-
-                <h3>4. Propiedad intelectual e industrial</h3>
-                <p>
-                  Todos los contenidos de LA WEB, incluyendo, sin carácter
-                  limitativo, textos, fotografías, gráficos, imágenes, iconos,
-                  tecnología, software, links y demás contenidos audiovisuales o
-                  sonoros, así como su diseño gráfico y códigos fuente, son
-                  propiedad de Codexalo o de terceros, sin que puedan entenderse
-                  cedidos al usuario ninguno de los derechos de explotación
-                  reconocidos por la normativa vigente en materia de propiedad
-                  intelectual sobre los mismos.
-                </p>
-
-                <h3>5. Responsabilidad</h3>
-                <p>
-                  Codexalo no se hace responsable del uso que los usuarios
-                  puedan hacer de los materiales publicados que vulnere los
-                  derechos de propiedad intelectual o industrial de terceros.
-                </p>
-                <p>
-                  Codexalo se reserva el derecho a modificar cualquier tipo de
-                  información que pudiera aparecer en LA WEB, sin que exista
-                  obligación de preavisar o poner en conocimiento de los
-                  usuarios dichas modificaciones.
-                </p>
-
-                <h3>6. Legislación aplicable</h3>
-                <p>
-                  Las presentes condiciones se regirán por la legislación
-                  española vigente. Para la resolución de cualquier
-                  controversia,<span> </span>
-                  las partes se someten a los Juzgados y Tribunales del
-                  domicilio del usuario.
-                </p>
-              </div>
-            )}
-
-            {modalAbierto === "privacidad" && (
-              <div className="legal-content">
-                <h2>Política de Privacidad</h2>
-                <p className="legal-intro">
-                  En cumplimiento del Reglamento (UE) 2016/679 del Parlamento
-                  Europeo y del Consejo, de 27 de abril de 2016, relativo a la
-                  protección de las personas físicas en lo que respecta al
-                  tratamiento de datos personales (RGPD) y de la Ley Orgánica
-                  3/2018, de 5 de diciembre, de Protección de Datos Personales y
-                  garantía de los derechos digitales (LOPDGDD), le informamos de
-                  lo siguiente:
-                </p>
-
-                <h3>1. Responsable del tratamiento</h3>
-                <p>
-                  <strong>Identidad:</strong> Codexalo
-                  <br />
-                  <strong>Email de contacto:</strong> codexalo.contact@gmail.com
-                </p>
-
-                <h3>2. Finalidad del tratamiento</h3>
-                <p>
-                  Los datos personales que nos facilite serán tratados con las
-                  siguientes finalidades:
-                </p>
-                <ul>
-                  <li>
-                    Responder a las consultas y solicitudes de información
-                    realizadas a través del formulario de contacto.
-                  </li>
-                  <li>
-                    Gestión y desarrollo de la relación contractual para la
-                    prestación de servicios de desarrollo de proyectos
-                    académicos.
-                  </li>
-                  <li>
-                    Envío de presupuestos personalizados y comunicaciones
-                    relacionadas con el servicio solicitado.
-                  </li>
-                </ul>
-
-                <h3>3. Legitimación</h3>
-                <p>
-                  La base legal para el tratamiento de sus datos es el
-                  consentimiento del interesado (artículo 6.1.a RGPD) y la
-                  ejecución de un contrato o medidas precontractuales (artículo
-                  6.1.b RGPD).
-                </p>
-
-                <h3>4. Destinatarios</h3>
-                <p>
-                  Sus datos no serán cedidos a terceros, salvo obligación legal.
-                  No se realizan transferencias internacionales de datos.
-                </p>
-
-                <h3>5. Conservación de los datos</h3>
-                <p>
-                  Los datos personales se conservarán mientras se mantenga la
-                  relación comercial o durante el tiempo necesario para cumplir
-                  con las obligaciones legales. Una vez finalizada la relación,
-                  los datos se conservarán bloqueados durante los plazos
-                  establecidos por la legislación aplicable.
-                </p>
-
-                <h3>6. Derechos de los interesados</h3>
-                <p>Usted tiene derecho a:</p>
-                <ul>
-                  <li>
-                    <strong>Acceso:</strong> Conocer qué datos personales
-                    estamos tratando sobre usted.
-                  </li>
-                  <li>
-                    <strong>Rectificación:</strong> Solicitar la corrección de
-                    datos inexactos o incompletos.
-                  </li>
-                  <li>
-                    <strong>Supresión:</strong> Solicitar la eliminación de sus
-                    datos cuando ya no sean necesarios.
-                  </li>
-                  <li>
-                    <strong>Oposición:</strong> Oponerse al tratamiento de sus
-                    datos.
-                  </li>
-                  <li>
-                    <strong>Limitación:</strong> Solicitar la limitación del
-                    tratamiento de sus datos.
-                  </li>
-                  <li>
-                    <strong>Portabilidad:</strong> Recibir sus datos en un
-                    formato estructurado y de uso común.
-                  </li>
-                </ul>
-                <p>
-                  Para ejercer estos derechos, puede dirigirse a
-                  codexalo.contact@gmail.com. También tiene derecho a presentar
-                  una reclamación ante la Agencia Española de Protección de
-                  Datos (www.aepd.es).
-                </p>
-
-                <h3>7. Seguridad de los datos</h3>
-                <p>
-                  Codexalo ha adoptado las medidas técnicas y organizativas
-                  necesarias para garantizar la seguridad de los datos
-                  personales y evitar su alteración, pérdida, tratamiento o
-                  acceso no autorizado.
-                </p>
-
-                <h3>8. Datos de menores</h3>
-                <p>
-                  Los servicios ofrecidos en esta web están dirigidos a personas
-                  mayores de 18 años. No se recopilan datos de menores de edad
-                  de forma intencionada.
-                </p>
-              </div>
-            )}
-
-            {modalAbierto === "cookies" && (
-              <div className="legal-content">
-                <h2>Política de Cookies</h2>
-                <p className="legal-intro">
-                  En cumplimiento de lo dispuesto en el artículo 22.2 de la Ley
-                  34/2002, de 11 de julio, de Servicios de la Sociedad de la
-                  Información y de Comercio Electrónico (LSSI-CE), Codexalo
-                  informa sobre las cookies utilizadas en este sitio web.
-                </p>
-
-                <h3>¿Qué son las cookies?</h3>
-                <p>
-                  Una cookie es un fichero que se descarga en su ordenador al
-                  acceder a determinadas páginas web. Las cookies permiten a una
-                  página web, entre otras cosas, almacenar y recuperar
-                  información sobre los hábitos de navegación de un usuario o de
-                  su equipo y, dependiendo de la información que contengan y de
-                  la forma en que utilice su equipo, pueden utilizarse para
-                  reconocer al usuario.
-                </p>
-
-                <h3>Tipos de cookies utilizadas</h3>
-
-                <h4>Cookies técnicas (necesarias)</h4>
-                <p>
-                  Son aquellas que permiten al usuario la navegación a través
-                  del sitio web y la utilización de las diferentes opciones o
-                  servicios que en ella existen. Este sitio web utiliza cookies
-                  técnicas imprescindibles para el correcto funcionamiento de la
-                  página.
-                </p>
-
-                <h4>Cookies de análisis</h4>
-                <p>
-                  Actualmente, este sitio web no utiliza cookies de análisis ni
-                  de terceros. En caso de incorporarse en el futuro, se
-                  solicitará el consentimiento previo del usuario.
-                </p>
-
-                <h3>Gestión de cookies</h3>
-                <p>
-                  Usted puede permitir, bloquear o eliminar las cookies
-                  instaladas en su equipo mediante la configuración de las
-                  opciones de su navegador de Internet. En caso de que no
-                  permita la instalación de cookies en su navegador, es posible
-                  que no pueda acceder a alguna de las funcionalidades del sitio
-                  web.
-                </p>
-
-                <h4>
-                  Cómo configurar las cookies en los navegadores principales:
-                </h4>
-                <ul>
-                  <li>
-                    <strong>Chrome:</strong> Configuración &gt; Privacidad y
-                    seguridad &gt; Cookies y otros datos de sitios
-                  </li>
-                  <li>
-                    <strong>Firefox:</strong> Opciones &gt; Privacidad y
-                    seguridad &gt; Cookies y datos del sitio web
-                  </li>
-                  <li>
-                    <strong>Safari:</strong> Preferencias &gt; Privacidad &gt;
-                    Cookies y datos de sitios web
-                  </li>
-                  <li>
-                    <strong>Edge:</strong> Configuración &gt; Cookies y permisos
-                    del sitio &gt; Cookies y datos de sitios almacenados
-                  </li>
-                </ul>
-
-                <h3>Actualización de la política de cookies</h3>
-                <p>
-                  Codexalo puede modificar esta Política de Cookies en función
-                  de exigencias legislativas, reglamentarias, o con la finalidad
-                  de adaptar dicha política a las instrucciones dictadas por la
-                  Agencia Española de Protección de Datos.
-                </p>
-                <p>
-                  Cuando se produzcan cambios significativos en esta Política de
-                  Cookies, se comunicará a los usuarios a través de la web.
-                </p>
-
-                <h3>Más información</h3>
-                <p>
-                  Si tiene dudas acerca de esta política de cookies, puede
-                  contactar con Codexalo en codexalo.contact@gmail.com
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {legalModals}
     </div>
   );
 }

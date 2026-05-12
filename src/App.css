@@ -1208,6 +1208,117 @@
 }
 
 /* ============================================
+   OPINIONES
+============================================ */
+.reviews {
+  padding: var(--spacing-3xl) 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+}
+
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-xl);
+  margin-top: var(--spacing-xl);
+}
+
+.review-card {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.review-card::before {
+  content: "\201C";
+  position: absolute;
+  top: -10px;
+  right: 16px;
+  font-size: 6rem;
+  color: rgba(30, 58, 138, 0.08);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.review-opinion {
+  font-size: 1.05rem;
+  color: var(--color-text);
+  line-height: 1.7;
+  margin-bottom: var(--spacing-lg);
+  position: relative;
+  z-index: 1;
+}
+
+.review-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  font-weight: 600;
+}
+
+.review-name {
+  color: var(--color-secondary);
+}
+
+.review-project {
+  color: var(--color-text-light);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.reviews-empty,
+.reviews-error {
+  text-align: center;
+  margin-top: var(--spacing-lg);
+  font-weight: 600;
+  color: var(--color-text-light);
+}
+
+/* ============================================
+   FORMULARIO REVIEW PRIVADO
+============================================ */
+.review-form {
+  padding: var(--spacing-3xl) 0;
+  background-color: var(--color-bg);
+}
+
+.review-form-wrapper {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: var(--spacing-2xl);
+  align-items: start;
+}
+
+.review-form-info h2 {
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  margin-bottom: var(--spacing-md);
+  color: var(--color-secondary);
+}
+
+.review-form-info p {
+  font-size: 1.05rem;
+  color: var(--color-text-light);
+  line-height: 1.7;
+  margin-bottom: var(--spacing-md);
+}
+
+.review-form-card {
+  background-color: white;
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.review-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* ============================================
    TRABAJA CON NOSOTROS
 ============================================ */
 .work-with-us {
@@ -1373,6 +1484,10 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .reviews-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .footer-content {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1402,6 +1517,10 @@
   }
 
   .work-wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .review-form-wrapper {
     grid-template-columns: 1fr;
   }
 
@@ -1625,6 +1744,10 @@
     gap: var(--spacing-lg);
   }
 
+  .reviews-grid {
+    grid-template-columns: 1fr;
+  }
+
   .service-card {
     padding: var(--spacing-lg);
   }
@@ -1811,6 +1934,8 @@
   .advantages,
   .guarantee,
   .contact,
+  .reviews,
+  .review-form,
   .how-it-works,
   .clases {
     padding: var(--spacing-xl) 0;

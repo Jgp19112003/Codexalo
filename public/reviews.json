@@ -1,0 +1,17 @@
+[
+  {
+    "nombre": "Laura M.",
+    "proyecto": "TFG DAM (backend Java)",
+    "opinion": "Me ayudaron a definir el alcance, estructurar la documentacion y llegar con todo listo a la defensa. Trato cercano y muy profesional."
+  },
+  {
+    "nombre": "Sergio P.",
+    "proyecto": "Clases particulares de React",
+    "opinion": "Las clases fueron muy practicas y directas. En pocas semanas pase de cero a poder montar mi propia app."
+  },
+  {
+    "nombre": "Nuria G.",
+    "proyecto": "Proyecto academico (IA aplicada)",
+    "opinion": "Buen seguimiento, entregas parciales claras y soporte real cuando surgian dudas. Recomendadisimo."
+  }
+]
